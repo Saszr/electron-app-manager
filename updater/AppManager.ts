@@ -567,7 +567,7 @@ export default class AppManager extends RepoBase{
     const appUrl = url.format({
       slashes: true,
       protocol,
-      pathname: `${hostname}/index.html`
+      pathname: `${hostname}`
     })
     return appUrl
   }

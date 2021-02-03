@@ -170,6 +170,7 @@ const serveRequestFromCache = async (hostname : string, pathname : string) => {
     // FIXME respect version
     let release = await appManager.getLatestCached()
     if (release) {
+      if (!pathname) pathname = `index.html`
       const entry = await appManager.getEntry(release, pathname)
       if (entry) {
         const content = await entry.file.readContent()
@@ -221,7 +222,12 @@ const hotLoadProtocolHandler = async (request : string, handler : any) => {
       pathname = pathname.slice(1)
     }
     const content = await serveRequestFromCacheMem(hostname, pathname)
-    return handler(content || -2)
+    if (pathname) {
+      handler(content)
+    } else {
+      handler({ mimeType: 'text/html', data: content })
+    }
+    return
   }
   
   // else: find the correct package / app based on url and version
