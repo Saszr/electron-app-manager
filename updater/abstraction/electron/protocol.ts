@@ -37,12 +37,12 @@ class Protocol implements IProtocol {
       // TODO intercepting not the same as registering
       // console.log('register protocol handler for', scheme)
       if(scheme === 'file'){
-        protocol.interceptBufferProtocol('file', (request : any, cb: (buffer?: Buffer) => void) => {
+        protocol.interceptBufferProtocol('file', (request : Electron.ProtocolRequest, cb: (response: Buffer) => void) => {
           const fileUri = getFilePath(request)
           handler(fileUri, cb)
         })
       } else {
-        protocol.registerBufferProtocol(scheme, (request : any, cb: (buffer?: Buffer) => void) => {
+        protocol.registerBufferProtocol(scheme, (request : Electron.ProtocolRequest, cb: (response: Buffer) => void) => {
           const fileUri = getFilePath(request)
           handler(fileUri, cb)
         })
