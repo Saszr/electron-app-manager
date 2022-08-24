@@ -25,7 +25,7 @@
   "dependencies": {
     "@octokit/rest": "^16.27.0",
     "electron-updater": "4.1.2",
-    "ethpkg": "EthereumRemix/ethpkg",
+    "ethpkg": "EthereumRemix/ethpkg#v0.3.0",
     "openpgp": "^4.4.5",
     "semver": "^5.6.0",
     "tar-stream": "^1.6.2",

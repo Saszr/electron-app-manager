@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>$WINDOW.TITLE$</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* background-color: #E1E1E1; */
+    }
+
+    .brand {
+      float: left;
+      color: #777;
+      padding-left: 8px;
+      padding-top: 13px;
+      font-size: .8rem;
+      font-family: Helvetica, Arial, sans-serif
+    }
+
+    .container .controls {
+      position: absolute;
+      width: 100%
+    }
+
+    .controls .button {
+      float: right;
+      color: #777;
+      padding-top: 8px;
+      padding-right: 13px;
+      font-size: 1.3rem;
+      font-weight: 100;
+      cursor: pointer;
+    }
+
+    canvas {
+      font-family: 'Font Awesome 5 Brands';
+      font-weight: 900;
+      margin: auto;
+    }
+
+    @keyframes blink {
+      0% {
+        opacity: 0.0;
+      }
+
+      50% {
+        opacity: .25;
+      }
+
+      100% {
+        opacity: 0.0;
+      }
+    }
+
+    .overlay {
+      /* background: linear-gradient(to bottom, #ffffffcc, #383838ad);*/
+      background: linear-gradient(to bottom, #6b6b6b62, #7373737c);
+      width: 100%;
+      height: 100%;
+      position: absolute;
+    }
+
+    .flash {
+      animation-name: blink;
+      animation-duration: 1.8s;
+      animation-iteration-count: infinite;
+      animation-fill-mode: backwards;
+    }
+  </style>
+
+  <script>
+    const PIXEL_RATIO = (function () {
+      let ctx = document.createElement("canvas").getContext("2d"),
+        dpr = window.devicePixelRatio || 1,
+        bsr = ctx.webkitBackingStorePixelRatio ||
+          ctx.mozBackingStorePixelRatio ||
+          ctx.msBackingStorePixelRatio ||
+          ctx.oBackingStorePixelRatio ||
+          ctx.backingStorePixelRatio || 1;
+      return dpr / bsr;
+    })();
+
+    createHiDPICanvas = function (w, h, ratio) {
+      if (!ratio) { ratio = PIXEL_RATIO; }
+      let canvas = document.createElement("canvas");
+      canvas.width = w * ratio;
+      canvas.height = h * ratio;
+      canvas.style.width = w + "px";
+      canvas.style.height = h + "px";
+      canvas.getContext("2d").setTransform(ratio, 0, 0, ratio, 0, 0);
+      return canvas;
+    }
+  </script>
+
+  <!--
+    FIXME broken icon rendering with display: block / flex
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+  -->
+
+</head>
+
+<body style="-webkit-app-region: drag">
+  <div id="container" class="container" style="-webkit-app-region: drag">
+    <div id="overlay" class="overlay flash" style="-webkit-app-region: drag"></div>
+    <div class="controls" style="-webkit-app-region: drag; display: none">
+      <span class="brand">Electron App Updater</span>
+      <span id="close-btn" class="button">
+        <i class="fas fa-times"></i>
+      </span>
+    </div>
+  </div>
+
+  <script>
+    window.data = JSON.parse('$app.info$')
+  </script>
+
+  <script>
+    const getImage = async imageUrl => {
+      return new Promise((resolve, reject) => {
+        const image = new Image()
+        image.onload = function () {
+          resolve(this)
+          console.profileEnd()
+        }
+        image.src = imageUrl
+      })
+    }
+
+    const getEthpkgLogo = () => {
+      const ethpkgLogo = `
+        <svg width="600" height="686" viewBox="0 0 600 686" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0.241063 489.169H0.16462V197.612C-0.055656 195.944 -0.054089 194.258 0.16462 192.598V191.859H0.276555C1.17459 186.621 4.24946 181.705 9.35123 178.503L288.596 3.23727C295.473 -1.07909 304.364 -1.07909 311.241 3.23728L590.484 178.503C595.586 181.705 598.661 186.621 599.559 191.859H599.672V192.606C599.855 193.999 599.885 195.411 599.759 196.815H599.835V488.372C600.056 490.039 600.054 491.725 599.835 493.385V494.124H599.723C598.825 499.362 595.751 504.278 590.649 507.48L311.404 682.746C304.527 687.062 295.636 687.062 288.759 682.746L9.51596 507.481C4.41409 504.278 1.33919 499.362 0.441235 494.124H0.328307V493.378C0.145296 491.984 0.115273 490.572 0.241063 489.169Z" fill="url(#paint0_linear)"/>
+        <path d="M301.313 197.667L299.857 202.614V346.192L301.313 347.645L367.96 308.25L301.313 197.667Z" fill="#B9B9B9" fill-opacity="0.7"/>
+        <path d="M301.314 197.667L234.667 308.25L301.314 347.646V277.957V197.667Z" fill="#B9B9B9" fill-opacity="0.4"/>
+        <path d="M301.313 369.802L300.493 371.044V434.579L301.313 437.556L368 320.889L301.313 369.802Z" fill="white" fill-opacity="0.85"/>
+        <path d="M301.313 347.645L367.959 308.25L301.313 277.958V347.645Z" fill="#B9B9B9" fill-opacity="0.4"/>
+        <path d="M234.667 308.251L301.313 347.645V277.958L234.667 308.251Z" fill="#E5E5E5" fill-opacity="0.5"/>
+        <path d="M139.795 409.469H139.754V254.62C139.637 253.735 139.638 252.839 139.754 251.957V251.565H139.813C140.29 248.783 141.923 246.172 144.633 244.471L292.943 151.386C296.595 149.093 301.317 149.093 304.97 151.386L453.279 244.471C455.989 246.172 457.622 248.783 458.099 251.565H458.159V251.961C458.256 252.702 458.272 253.451 458.205 254.197H458.246V409.046C458.363 409.932 458.362 410.827 458.246 411.709V412.101H458.186C457.709 414.883 456.076 417.494 453.367 419.195L305.057 512.28C301.404 514.573 296.682 514.573 293.03 512.28L144.721 419.195C142.011 417.494 140.378 414.883 139.901 412.101H139.841V411.705C139.744 410.965 139.728 410.215 139.795 409.469Z" fill="#CCCCCC" fill-opacity="0.4"/>
+        <path d="M301.314 437.555V369.802L234.667 320.889L301.314 437.555Z" fill="white" fill-opacity="0.4"/>
+        <line x1="141.033" y1="249.954" x2="301.366" y2="346.62" stroke="white" stroke-width="4"/>
+        <line x1="299.966" y1="346.621" x2="457.3" y2="251.621" stroke="white" stroke-width="4"/>
+        <line x1="302.333" y1="368.657" x2="303" y2="513.991" stroke="white" stroke-width="4"/>
+        <defs>
+        <linearGradient id="paint0_linear" x1="300" y1="0" x2="300" y2="685.983" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#2B303E"/>
+        <stop offset="1"/>
+        </linearGradient>
+        </defs>
+        </svg>
+        `
+      try {
+        const svg64 = btoa(ethpkgLogo)
+        return `data:image/svg+xml;base64,${svg64}`
+      } catch (error) {
+        alert('could not load logo' + error.message)
+      }
+    }
+  </script>
+
+  <script>
+
+    const cw = 600 // window.innerWidth
+    const ch = 400 // window.innerHeight
+
+    const initCanvas = (w, h) => {
+      const container = document.getElementById('container')
+      //Create canvas with the device resolution.
+      const canvas = createHiDPICanvas(w, h)
+      container.appendChild(canvas)
+      return canvas
+    }
+
+    const canvas = initCanvas(cw, ch)
+    // console.log('cw/ch', cw, ch)
+    const ctx = canvas.getContext('2d')
+
+    const resetCanvas = () => {
+      /*
+      var grd = ctx.createLinearGradient(0, 0, cw, 0);
+      grd.addColorStop(0, "#F3F3F3");
+      grd.addColorStop(1, "#F3F3F3");
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, cw, ch);
+      */
+      ctx.clearRect(0, 0, cw, ch)
+    }
+
+    const resetProgressCanvas = () => {
+      // TODO make this user defined
+      // ctx.fillStyle = '#dfddda';
+      // ctx.fillRect(0, 0, cw, ch);
+      ctx.clearRect(0, 0, cw, ch)
+    }
+
+    const hideCanvas = () => {
+      canvas.style.display = 'none'
+    }
+
+    const writeText = (text, y, s = 30) => {
+      ctx.font = s + "px Helvetica";
+      ctx.fillStyle = "#333"
+      const m = ctx.measureText(text)
+      ctx.fillText(text, (cw / 2) - (m.width / 2), y)
+    }
+
+    const writeIcon = (text, y, s = 40) => {
+      // FIXME calc font size
+      ctx.font = '900 90px "Font Awesome 5 Brands"';
+      ctx.fillStyle = "#aaa"
+      const m = ctx.measureText(text)
+      ctx.fillText(text, (cw / 2) - (m.width / 2), (ch / 2) - (m.width / 2))
+    }
+
+    const displayTitle = text => writeText(text, 70, 28)
+
+    const displaySubTitle = text => writeText(text, 100, 18)
+
+    const writeCenteredIcon = icon => writeIcon(icon, 140)
+    
+    const data = window.data || {}
+    const githubLogoEnc = data.logo
+    let githubLogo = null
+    getImage(githubLogoEnc)
+    .then(img => {
+      githubLogo = img
+    })
+    .then(() => {
+      displayConnecting(window.data.name)
+    }) 
+
+    const writeCenteredImage = img => {
+      const imgWidth = 100
+      const imgHeight = 100
+      const headerOffset = 30
+      const x1 = ((cw / 2) - (imgWidth / 2))
+      const y1 = ((ch / 2) - (imgHeight / 2)) + headerOffset
+      ctx.drawImage(img, x1, y1, imgWidth, imgHeight)
+    }
+
+    const displayBottomText = text => {
+      const fontHeight = 16
+      writeText(text, ch - fontHeight, fontHeight)
+    }
+
+    const displayConnecting = (repo) => {
+      const data = window.data || {}
+      const version = data.version || 'Latest'
+      const name = data.name || ''
+      displayTitle(`Find Release : ${version}`)
+      // FIXME writeCenteredIcon("\uf09b")
+      if(githubLogo) {
+        writeCenteredImage(githubLogo)
+      }
+      displayBottomText(repo)
+    }
+
+  </script>
+
+  <script>
+
+    // get references to DOM elements
+    const overlay = document.getElementById('overlay')
+    const closeBtn = document.getElementById('close-btn')
+    // canvas and ctx already in global scope
+
+    closeBtn.onclick = () => {
+      window.close()
+    }
+
+    const hideOverlay = () => {
+      overlay.style.display = "none"
+    }
+
+    const formatFileSize = _bytes => {
+      const fSize = (_bytes / (1024 * 1024)).toFixed(2)
+      return fSize
+    }
+
+    const displayProgress = (app, progress) => {
+
+      let prog = progress / 100
+
+      let appName = app.displayName
+      let _img = app.img
+      let fileSize = app.size
+      let fileProgress = formatFileSize(prog * fileSize)
+      fileSize = formatFileSize(fileSize)
+
+      let pFormatted = `${fileProgress} / ${fileSize} MB`
+
+      hideOverlay()
+
+      resetProgressCanvas()
+
+      displayTitle('Loading')
+
+      displaySubTitle(`${app.displayName} - ${app.version}`)
+
+      // writeText(pFormatted, ch * (2/3), 30)
+      ctx.save()
+      // ctx.globalCompositeOperation = 'difference';
+
+      // ctx.fillStyle = '#202225';
+      ctx.fillStyle = '#6ff7a520';
+      const progressHeight = 10
+      ctx.fillRect(0, ch - progressHeight, prog * cw, progressHeight);
+      ctx.restore()
+
+      displayBottomText(pFormatted)
+
+      // writeCenteredIcon("\uf09b")
+      if (_img) {
+        try {
+          writeCenteredImage(_img)
+        } catch (error) {
+          console.log('bad icon', _img, error)
+          img = null
+          // TODO reset global img here to avoid more attempts
+        }
+      }
+    }
+
+    resetCanvas()
+
+    document.fonts.ready.then(_ => {
+      displayConnecting(window.data.name)
+    })
+
+    let imageLoading = false
+    let img = null
+    let progress = 0
+    window.addEventListener('update', function (e) {
+      const data = e.detail
+      const { app, progress } = data
+
+      let { icon } = app
+
+      // if app is not providing a logo use ethpkg
+      if (!icon && !img) {
+        icon = getEthpkgLogo()
+      }
+
+      if (!imageLoading) {
+        imageLoading = true
+        getImage(icon).then(_img => {
+          img = _img
+        })
+      }
+
+      app.img = img
+      // console.log('on progress', progress, data)
+      if (app) {
+        displayProgress(app, progress)
+      }
+    }, false)
+
+  </script>
+
+
+</body>
+
+</html>

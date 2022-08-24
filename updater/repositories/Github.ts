@@ -4,7 +4,7 @@ import RepoBase from '../api/RepoBase'
 // @ts-ignore
 import { download, downloadJson } from '../lib/downloader'
 import semver from 'semver'
-import GitHub, { ReposListReleasesResponseItem } from '@octokit/rest'
+import { Octokit } from '@octokit/rest'
 import path from 'path'
 import { isRelease, hasSupportedExtension, extractPlatform, extractArchitecture, simplifyVersion } from '../util'
 
@@ -17,7 +17,7 @@ interface IAsset {
 
 class Github extends RepoBase implements IRemoteRepository {
   
-  private client: GitHub;
+  private client: Octokit;
   private _repositoryUrl: string;
   private owner: string;
   private repo: string;
@@ -30,12 +30,12 @@ class Github extends RepoBase implements IRemoteRepository {
     super()
     // WARNING: For unauthenticated requests, the rate limit allows for up to 60 requests per hour.
     if (process.env.GITHUB_TOKEN && typeof process.env.GITHUB_TOKEN === 'string') {
-      this.client = new GitHub({
+      this.client = new Octokit({
         // @ts-ignore
         auth: process.env.GITHUB_TOKEN
       })
     } else {
-      this.client = new GitHub()
+      this.client = new Octokit()
     }
 
     this.filter = options && options.filter
@@ -90,7 +90,7 @@ class Github extends RepoBase implements IRemoteRepository {
     }
   }
 
-  private toRelease(releaseInfo : ReposListReleasesResponseItem) : Array<IRelease | IInvalidRelease> {
+  private toRelease(releaseInfo : any) : Array<IRelease | IInvalidRelease> {
 
     const {
       /*
@@ -151,7 +151,7 @@ class Github extends RepoBase implements IRemoteRepository {
       assets = assets.filter(asset => asset.name.includes(this.prefixFilter))
     }
 
-    assets = assets.filter(asset => hasSupportedExtension(asset.name))
+    assets = assets.filter((asset: any) => hasSupportedExtension(asset.name))
     if(assets.length <= 0){
       return [{
         name: tag_name,
@@ -159,7 +159,7 @@ class Github extends RepoBase implements IRemoteRepository {
       }]
     }
 
-    let releases = assets.map(a => this.assetToRelease(a, {
+    let releases = assets.map((a: any) => this.assetToRelease(a, {
       releaseName,
       tag_name,
       branch,
@@ -195,7 +195,7 @@ class Github extends RepoBase implements IRemoteRepository {
         sha512
       }
     } catch (error) {
-      console.log('metadata download failed', error.message);
+      console.log('metadata download failed', (error as any).message);
       return null;
     }
   }
@@ -269,7 +269,7 @@ class Github extends RepoBase implements IRemoteRepository {
       return sort ? this.sortReleases(releases) : releases
 
     } catch (error) {
-      console.log('could not retrieve releases list from github', error.message)
+      console.log('could not retrieve releases list from github', (error as  any).message)
       // FIXME handle API errors such as rate-limits
       return []
     }
