@@ -174,7 +174,7 @@ const serveRequestFromCache = async (hostname : string, pathname : string) => {
       if (entry) {
         const content = await entry.file.readContent()
         const mimeType = getMimeType(pathname)
-        return { mimeType: mimeType, buffer: content}
+        return { mimeType: mimeType, data: content}
       } else {
         console.log('HOT-LOAD WARNING: file not found in pkg', pathname)
         return undefined
