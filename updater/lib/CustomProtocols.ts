@@ -221,6 +221,9 @@ const hotLoadProtocolHandler = async (request : string, handler : any) => {
     if (pathname.startsWith('/')) {
       pathname = pathname.slice(1)
     }
+    if (pathname.startsWith('index.html') && pathname !== 'index.html') {
+      pathname = pathname.substring('index.html'.length)
+    }
     const content = await serveRequestFromCacheMem(hostname, pathname)
     return handler(content || -2)
   }
