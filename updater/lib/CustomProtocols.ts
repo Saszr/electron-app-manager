@@ -6,7 +6,7 @@ import { getRepository } from '../repositories'
 import { request, download } from '../lib/downloader'
 import { pkgsign } from 'ethpkg'
 import protocol from '../abstraction/protocol'
-import { findWebContentsByTitle, memoize, generateHostnameForRelease } from '../util'
+import { findWebContentsByTitle, memoize, generateHostnameForRelease, getMimeType } from '../util'
 import AppManager from '../AppManager'
 import { md5 } from '../lib/hashes'
 // import { createSwitchVersionMenu, createCheckUpdateMenu, createMenu } from '../electron/menu'
@@ -173,7 +173,8 @@ const serveRequestFromCache = async (hostname : string, pathname : string) => {
       const entry = await appManager.getEntry(release, pathname)
       if (entry) {
         const content = await entry.file.readContent()
-        return content
+        const mimeType = getMimeType(pathname)
+        return { mimeType: mimeType, buffer: content}
       } else {
         console.log('HOT-LOAD WARNING: file not found in pkg', pathname)
         return undefined

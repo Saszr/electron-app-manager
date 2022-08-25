@@ -30,6 +30,19 @@ function getFilePath(request: any) {
   return filePath
 }
 
+interface MimeTypedBuffer {
+
+  // Docs: http://electronjs.org/docs/api/structures/mime-typed-buffer
+
+  /**
+   * The actual Buffer content.
+   */
+  data: Buffer;
+  /**
+   * The mimeType of the Buffer that you are sending.
+   */
+  mimeType: string;
+}
 
 class Protocol implements IProtocol {
   registerProtocolHandler(scheme: string, handler: Function) {
@@ -42,7 +55,7 @@ class Protocol implements IProtocol {
           handler(fileUri, cb)
         })
       } else {
-        protocol.registerBufferProtocol(scheme, (request : any, cb: (buffer?: Buffer) => void) => {
+        protocol.registerBufferProtocol(scheme, (request : any, cb: (data: MimeTypedBuffer) => void) => {
           const fileUri = getFilePath(request)
           handler(fileUri, cb)
         })

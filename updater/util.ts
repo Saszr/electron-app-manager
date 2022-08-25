@@ -7,6 +7,7 @@ import { download } from "./lib/downloader"
 import semver from 'semver'
 import { WebContents } from 'electron'
 import { md5 } from './lib/hashes'
+import { mimeType } from './mimeType'
 
 export function parseXml(xml : string){
   return new Promise((resolve, reject) => {
@@ -284,3 +285,10 @@ export const generateHostnameForRelease = async (release : IRelease) => {
   const host = md5(name) // hash to eliminate special chars
   return `${host}.mod`
 }
+
+export const getMimeType = (pathName: string) => {
+  let ext = '.txt'
+  let extReg = pathName.match(/\.[0-9a-z]+$/i)  
+  if (extReg) ext = extReg[0]
+  return mimeType[ext]
+} 
