@@ -162,7 +162,7 @@ const serveRequestFromCache = (hostname, pathname) => __awaiter(void 0, void 0, 
             if (entry) {
                 const content = yield entry.file.readContent();
                 const mimeType = util_1.getMimeType(pathname);
-                return { mimeType: mimeType, buffer: content };
+                return { mimeType: mimeType, data: content };
             }
             else {
                 console.log('HOT-LOAD WARNING: file not found in pkg', pathname);
@@ -204,6 +204,9 @@ const hotLoadProtocolHandler = (request, handler) => __awaiter(void 0, void 0, v
         // console.log('serve resource from package', hostname, pathname)
         if (pathname.startsWith('/')) {
             pathname = pathname.slice(1);
+        }
+        if (pathname.startsWith('index.html') && pathname !== 'index.html') {
+            pathname = pathname.substring('index.html'.length);
         }
         const content = yield serveRequestFromCacheMem(hostname, pathname);
         return handler(content || -2);
