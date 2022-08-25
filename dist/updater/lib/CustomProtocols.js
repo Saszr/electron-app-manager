@@ -161,7 +161,8 @@ const serveRequestFromCache = (hostname, pathname) => __awaiter(void 0, void 0, 
             const entry = yield appManager.getEntry(release, pathname);
             if (entry) {
                 const content = yield entry.file.readContent();
-                return content;
+                const mimeType = util_1.getMimeType(pathname);
+                return { mimeType: mimeType, buffer: content };
             }
             else {
                 console.log('HOT-LOAD WARNING: file not found in pkg', pathname);

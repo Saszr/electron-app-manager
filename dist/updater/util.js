@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateHostnameForRelease = exports.memoize = exports.findWebContentsByTitle = exports.isPackaged = exports.isElectron = exports.getEthpkg = exports.isRelease = exports.hasSupportedExtension = exports.getExtension = exports.isUrl = exports.compareVersions = exports.simplifyVersion = exports.extractArchitecture = exports.extractPlatform = exports.extractVersion = exports.parseXml = void 0;
+exports.getMimeType = exports.generateHostnameForRelease = exports.memoize = exports.findWebContentsByTitle = exports.isPackaged = exports.isElectron = exports.getEthpkg = exports.isRelease = exports.hasSupportedExtension = exports.getExtension = exports.isUrl = exports.compareVersions = exports.simplifyVersion = exports.extractArchitecture = exports.extractPlatform = exports.extractVersion = exports.parseXml = void 0;
 const path_1 = __importDefault(require("path"));
 // @ts-ignore
 const xml2js_1 = require("xml2js");
@@ -20,6 +20,7 @@ const ethpkg_1 = require("ethpkg");
 const downloader_1 = require("./lib/downloader");
 const semver_1 = __importDefault(require("semver"));
 const hashes_1 = require("./lib/hashes");
+const mimeType_1 = require("./mimeType");
 function parseXml(xml) {
     return new Promise((resolve, reject) => {
         xml2js_1.parseString(xml, (err, result) => {
@@ -292,3 +293,11 @@ exports.generateHostnameForRelease = (release) => __awaiter(void 0, void 0, void
     const host = hashes_1.md5(name); // hash to eliminate special chars
     return `${host}.mod`;
 });
+exports.getMimeType = (pathName) => {
+    let ext = '.txt';
+    let extReg = pathName.match(/\.[0-9a-z]+$/i);
+    if (extReg)
+        ext = extReg[0];
+    // @ts-ignore
+    return mimeType_1.mimeType[ext];
+};

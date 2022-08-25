@@ -23,3 +23,4 @@ export declare const isPackaged: () => boolean | undefined;
 export declare const findWebContentsByTitle: (windowTitle: string) => Promise<WebContents>;
 export declare const memoize: (fn: Function) => (...args: any[]) => Promise<any>;
 export declare const generateHostnameForRelease: (release: IRelease) => Promise<string>;
+export declare const getMimeType: (pathName: string) => string;

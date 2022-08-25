@@ -286,9 +286,10 @@ export const generateHostnameForRelease = async (release : IRelease) => {
   return `${host}.mod`
 }
 
-export const getMimeType = (pathName: string) => {
+export const getMimeType = (pathName: string): string => {
   let ext = '.txt'
   let extReg = pathName.match(/\.[0-9a-z]+$/i)  
   if (extReg) ext = extReg[0]
+  // @ts-ignore
   return mimeType[ext]
 } 
