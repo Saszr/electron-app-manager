@@ -1,6 +1,6 @@
 {
-  "name": "@philipplgh/electron-app-manager",
-  "version": "0.55.0",
+  "name": "@ethereumremix/electron-app-manager",
+  "version": "0.55.1",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
