@@ -20,7 +20,6 @@ const RepoBase_1 = __importDefault(require("./api/RepoBase"));
 const menu_1 = __importDefault(require("./electron/menu"));
 const repositories_1 = require("./repositories");
 const util_1 = require("./util");
-const ethpkg_1 = require("ethpkg");
 const downloader_1 = require("./lib/downloader");
 let autoUpdater, CancellationToken = null;
 let dialogs = null;
@@ -376,9 +375,9 @@ class AppManager extends RepoBase_1.default {
             if (release && download) {
                 const { downloadOptions } = options;
                 const downloadResult = yield this.download(release, downloadOptions);
-                if (downloadResult && verify && !downloadResult.verificationResult) {
-                    throw new Error(`Error: External package ${name} has no verification info.`);
-                }
+                /*if (downloadResult && verify && !downloadResult.verificationResult) {
+                  throw new Error(`Error: External package ${name} has no verification info.`)
+                }*/
                 return downloadResult;
             }
             return release;
@@ -401,9 +400,9 @@ class AppManager extends RepoBase_1.default {
             if (latest && latest.remote && download) {
                 const { downloadOptions } = options;
                 const downloadResult = yield this.download(latest, downloadOptions);
-                if (downloadResult && verify && !downloadResult.verificationResult) {
-                    throw new Error(`Error: External package ${name} has no verification info.`);
-                }
+                /*if (downloadResult && verify && !downloadResult.verificationResult) {
+                  throw new Error(`Error: External package ${name} has no verification info.`)
+                }*/
                 return downloadResult;
             }
             return latest;
@@ -447,8 +446,8 @@ class AppManager extends RepoBase_1.default {
             const location = path_1.default.join(targetDir, release.fileName);
             // verify package signature: TODO we can enforce a policy here that invalid
             // packages are not even written to disk
-            const pkg = yield util_1.getEthpkg(packageData);
-            const verificationResult = yield ethpkg_1.pkgsign.verify(pkg);
+            // const pkg = await getEthpkg(packageData)
+            // const verificationResult = await pkgsign.verify(pkg!)
             if (writePackageData) {
                 if (writeDetachedMetadata) {
                     const detachedMetadataPath = path_1.default.join(targetDir, release.fileName + '.metadata.json');
@@ -457,8 +456,7 @@ class AppManager extends RepoBase_1.default {
                 // TODO patch package metadata if it doesn't exist
                 // TODO write to .temp and rename to minimize risk of corrupted downloads
                 fs_1.default.writeFileSync(location, packageData);
-                let releaseDownloaded = Object.assign(Object.assign({}, release), { remote: false, verificationResult,
-                    location });
+                let releaseDownloaded = Object.assign(Object.assign({}, release), { remote: false, location });
                 if (extractPackage) {
                     const extractedPackagePath = yield this.extract(releaseDownloaded, onExtractionProgress);
                     releaseDownloaded.extractedPackagePath = extractedPackagePath;
@@ -468,7 +466,7 @@ class AppManager extends RepoBase_1.default {
             }
             else {
                 this.emit('update-downloaded', release);
-                return Object.assign(Object.assign({}, release), { location: 'memory', remote: false, verificationResult, data: packageData });
+                return Object.assign(Object.assign({}, release), { location: 'memory', remote: false, data: packageData });
             }
         });
     }

@@ -80,7 +80,7 @@ class Cache extends RepoBase implements IRepository {
         error: 'No metadata: ' + fileName
       }
     }
-    const verificationResult = await appPackage.verify()
+    // const verificationResult = await appPackage.verify()
     if(metadata.signature) {
       //console.log('signature found', release.signature)
       //let result = await verifyPGP(binFileName, pubKeyBuildServer, metadata.signature)
@@ -93,7 +93,7 @@ class Cache extends RepoBase implements IRepository {
       ...metadata,
       ...release,
       extractedPackagePath,
-      verificationResult,
+      /// verificationResult,
       remote: false
     }
 

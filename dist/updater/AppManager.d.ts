@@ -58,7 +58,6 @@ export default class AppManager extends RepoBase {
     download(release: IRelease, { writePackageData, writeDetachedMetadata, targetDir, onProgress, extractPackage, // ignored if not written to disk (writePackageData)
     onExtractionProgress, }?: IDownloadOptions): Promise<{
         remote: boolean;
-        verificationResult: import("ethpkg/dist/IVerificationResult").IVerificationResult;
         location: string;
         name: string;
         displayName: string;
@@ -81,7 +80,6 @@ export default class AppManager extends RepoBase {
     } | {
         location: string;
         remote: boolean;
-        verificationResult: import("ethpkg/dist/IVerificationResult").IVerificationResult;
         data: Buffer;
         name: string;
         displayName: string;

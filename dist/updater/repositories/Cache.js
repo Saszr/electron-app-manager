@@ -82,7 +82,7 @@ class Cache extends RepoBase_1.default {
                     error: 'No metadata: ' + fileName
                 };
             }
-            const verificationResult = yield appPackage.verify();
+            // const verificationResult = await appPackage.verify()
             if (metadata.signature) {
                 //console.log('signature found', release.signature)
                 //let result = await verifyPGP(binFileName, pubKeyBuildServer, metadata.signature)
@@ -91,8 +91,9 @@ class Cache extends RepoBase_1.default {
             const extractedPackagePath = fs_1.default.existsSync(appPackage.extractedPackagePath) ? appPackage.extractedPackagePath : undefined;
             // console.log('metadata', metadata)
             // order is important or location e.g. would be url
-            release = Object.assign(Object.assign(Object.assign({}, metadata), release), { extractedPackagePath,
-                verificationResult, remote: false });
+            release = Object.assign(Object.assign(Object.assign({}, metadata), release), { extractedPackagePath, 
+                /// verificationResult,
+                remote: false });
             return release;
         });
     }

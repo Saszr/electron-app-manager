@@ -421,9 +421,9 @@ export default class AppManager extends RepoBase{
     if (release && download) {
       const { downloadOptions } = options
       const downloadResult = await this.download(release, downloadOptions)
-      if (downloadResult && verify && !downloadResult.verificationResult) {
+      /*if (downloadResult && verify && !downloadResult.verificationResult) {
         throw new Error(`Error: External package ${name} has no verification info.`)
-      }
+      }*/
       return downloadResult
     }
     return release
@@ -445,9 +445,9 @@ export default class AppManager extends RepoBase{
     if (latest && latest.remote && download) {
       const { downloadOptions } = options
       const downloadResult = await this.download(latest, downloadOptions)
-      if (downloadResult && verify && !downloadResult.verificationResult) {
+      /*if (downloadResult && verify && !downloadResult.verificationResult) {
         throw new Error(`Error: External package ${name} has no verification info.`)
-      }
+      }*/
       return downloadResult
     }
     return latest
@@ -503,8 +503,8 @@ export default class AppManager extends RepoBase{
 
     // verify package signature: TODO we can enforce a policy here that invalid
     // packages are not even written to disk
-    const pkg = await getEthpkg(packageData)
-    const verificationResult = await pkgsign.verify(pkg!)
+    // const pkg = await getEthpkg(packageData)
+    // const verificationResult = await pkgsign.verify(pkg!)
 
     if(writePackageData){
       if(writeDetachedMetadata){
@@ -517,7 +517,6 @@ export default class AppManager extends RepoBase{
       let releaseDownloaded = {
         ...release,
         remote: false,
-        verificationResult,
         location
       }
       if (extractPackage) {
@@ -532,7 +531,6 @@ export default class AppManager extends RepoBase{
         ...release,
         location: 'memory',
         remote: false,
-        verificationResult,
         data: packageData
       }
     }
