@@ -19,7 +19,7 @@ export const registerPackageProtocol = (cacheDir? : string) => {
     protocol.registerStandardSchemes(['package'], { secure: true })
   } else {
     protocol.registerSchemesAsPrivileged([
-      { scheme: 'package', privileges: { standard: true, secure: true } }
+      { scheme: 'package', privileges: { standard: true, secure: true, supportFetchAPI: true } }
     ])
   }
   registerHotLoadProtocol(cacheDir)
