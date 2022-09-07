@@ -32,7 +32,7 @@ exports.registerPackageProtocol = (cacheDir) => {
     }
     else {
         protocol.registerSchemesAsPrivileged([
-            { scheme: 'package', privileges: { standard: true, secure: true } }
+            { scheme: 'package', privileges: { standard: true, secure: true, supportFetchAPI: true } }
         ]);
     }
     CustomProtocols_1.registerHotLoadProtocol(cacheDir);
