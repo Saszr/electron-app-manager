@@ -23,7 +23,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@octokit/rest": "^16.27.0",
+    "@octokit/rest": "19.0.5",
     "electron-updater": "4.1.2",
     "ethpkg": "EthereumRemix/ethpkg#v0.3.0",
     "openpgp": "^4.4.5",
